@@ -26,10 +26,10 @@ The project is divided into 4 main parts:
 
 | Person | Main Part | Main Responsibility |
 |---|---|---|
-| 👩‍💻 Person 1 | Authentication & Users | Register, Login, JWT, bcrypt, Middleware, Roles | ==>Mai
-| 👩‍💻 Person 2 | Movies | Movie CRUD, Search, Filtering | ==>Nour
-| 👩‍💻 Person 3 | Showtimes | Showtime CRUD, Date/Time validation | ==>Mawaheb
-| 👩‍💻 Person 4 | Bookings & Seats | Booking, Seats, Price, Cancellation | ==>Amal
+| 👩‍💻 Person 1 (==>Mai) | Authentication & Users | Register, Login, JWT, bcrypt, Middleware, Roles | 
+| 👩‍💻 Person 2 (==>Nour) | Movies | Movie CRUD, Search, Filtering | 
+| 👩‍💻 Person 3 (==>Mawaheb) | Showtimes | Showtime CRUD, Date/Time validation | 
+| 👩‍💻 Person 4 (==>Amal) | Bookings & Seats | Booking, Seats, Price, Cancellation | 
 
 > Important: The four parts are connected. Everyone should agree on the database fields, API routes, and folder structure before starting.
 
