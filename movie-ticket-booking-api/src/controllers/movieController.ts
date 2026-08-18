@@ -5,8 +5,22 @@ export const GetAllMovies=async (req:Request,res:Response)=>
 {
     try
     {
-       const all=await Movie.find();
-       return res.status(200).json(all);
+       const {title,genre,status}=req.query;
+       const filter:any={};
+       if(title)
+       {
+         filter.title=title;
+       }
+       if(genre)
+       {
+          filter.genre=genre;
+       }
+       if(status)
+       {
+        filter.status=status;
+       }
+        const all=await Movie.find(filter);
+        return res.status(200).json(all);
     }
     catch(error)
     {
