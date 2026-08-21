@@ -5,7 +5,7 @@ import Booking from "../models/Booking";
 export const createShowTimes=async(req:Request,res:Response)=>{
     try{
        const{movie,hallNo,date,startTime,endTime,ticketPrice,totalCapacity}=req.body
-       const movieExist = await movie.findById(movie)
+       const movieExist = await Movie.findById(movie)
         if(!movieExist){
            return res.status(404).json({message:"Movie not found"})
         }
