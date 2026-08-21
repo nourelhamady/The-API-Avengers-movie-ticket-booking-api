@@ -43,4 +43,5 @@ const movieSchema=new mongoose.Schema
         }
     }
 );
+
 export default mongoose.model("Movie",movieSchema);

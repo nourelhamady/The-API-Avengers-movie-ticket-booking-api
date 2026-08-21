@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-interface authPayload {
+export interface authPayload {
     userId : string;
     role : "customer" | "admin";
 }
@@ -14,14 +14,15 @@ export function authMiddleware (req : Request, res : Response, next : NextFuncti
         return res.status(401).json({ message: "No token provided" });
 
     const token = authHeader.split(" ")[1];
-    try {
+    try 
+    {
          const decoded = jwt.verify(token, process.env.JWT_SECRET!) as authPayload;
          (req as authRequest).user = decoded;
          next();
     }
-
-    catch (error) {
-         return res.status(401).json({ message: "Invalid or expired token" });
+    catch (error) 
+    {
+        return res.status(401).json({ message: "Invalid or expired token" });
     }
 }
 

@@ -5,7 +5,8 @@ import {
   getBookingById,
   cancelBooking,
 } from "../controllers/bookingController";
-
+import { requireRole } from "../middlewares/roleMiddleware";
+import { authMiddleware } from "../middlewares/authMiddleware";
 import { createBookingValidator } from "../validators/bookingValidator";
 
 const bookingRoutes = express.Router();
@@ -22,7 +23,7 @@ const bookingRoutes = express.Router();
  * @swagger
  * /api/bookings:
  *   post:
- *     summary: Create a new booking
+ *     summary: Create a movie booking
  *     tags: [Bookings]
  *     security:
  *       - bearerAuth: []
@@ -31,53 +32,32 @@ const bookingRoutes = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - showtime
- *               - seats
- *             properties:
- *               showtime:
- *                 type: string
- *                 example: 68a123456789abcdef123456
- *               seats:
- *                 type: integer
- *                 minimum: 1
- *                 example: 2
+ *             $ref: '#/components/schemas/CreateBooking'
  *     responses:
  *       201:
  *         description: Booking created successfully
  *       400:
- *         description: Validation error
+ *         description: Invalid seats, capacity exceeded, or showtime already started
  *       401:
  *         description: Unauthorized
- *       404:
- *         description: Showtime not found
- *       500:
- *         description: Server error
  */
-bookingRoutes.post(
-  "/",
-  createBookingValidator,
-  createBooking
-);
+bookingRoutes.post("/",authMiddleware,requireRole("customer"),createBookingValidator,createBooking);
 
 /**
  * @swagger
  * /api/bookings:
  *   get:
- *     summary: Get current user's bookings
+ *     summary: Get current customer's bookings
  *     tags: [Bookings]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of user's bookings
+ *         description: Customer bookings retrieved successfully
  *       401:
  *         description: Unauthorized
- *       500:
- *         description: Server error
  */
-bookingRoutes.get("/", getMyBookings);
+bookingRoutes.get("/",authMiddleware,requireRole("customer"), getMyBookings);
 
 /**
  * @swagger
@@ -93,18 +73,13 @@ bookingRoutes.get("/", getMyBookings);
  *         required: true
  *         schema:
  *           type: string
- *         example: 68a123456789abcdef123456
  *     responses:
  *       200:
- *         description: Booking retrieved successfully
- *       401:
- *         description: Unauthorized
+ *         description: Booking found
  *       404:
  *         description: Booking not found
- *       500:
- *         description: Server error
  */
-bookingRoutes.get("/:id", getBookingById);
+bookingRoutes.get("/:id",authMiddleware,requireRole("customer"), getBookingById);
 
 /**
  * @swagger
@@ -120,18 +95,15 @@ bookingRoutes.get("/:id", getBookingById);
  *         required: true
  *         schema:
  *           type: string
- *         example: 68a123456789abcdef123456
  *     responses:
  *       200:
  *         description: Booking cancelled successfully
- *       401:
- *         description: Unauthorized
+ *       400:
+ *         description: Booking cannot be cancelled
  *       404:
  *         description: Booking not found
- *       500:
- *         description: Server error
  */
-bookingRoutes.patch("/:id/cancel", cancelBooking);
+bookingRoutes.patch("/:id/cancel",authMiddleware,requireRole("customer"), cancelBooking);
 
 
 export default bookingRoutes;

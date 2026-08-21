@@ -20,8 +20,6 @@ const showtimeRoutes=Router()
  *     responses:
  *       200:
  *         description: Showtimes retrieved successfully
- *       500:
- *         description: Server error
  */
 showtimeRoutes.get("/", allShowTimes);
 
@@ -37,14 +35,11 @@ showtimeRoutes.get("/", allShowTimes);
  *         required: true
  *         schema:
  *           type: string
- *         example: 68a123456789abcdef123456
  *     responses:
  *       200:
- *         description: Showtime retrieved successfully
+ *         description: Showtime found
  *       404:
  *         description: Showtime not found
- *       500:
- *         description: Server error
  */
 showtimeRoutes.get("/:id", ShowTimebyID);
 
@@ -52,10 +47,43 @@ showtimeRoutes.get("/:id", ShowTimebyID);
  * @swagger
  * /api/showtimes:
  *   post:
- *     summary: Create a new showtime
+ *     summary: Create a showtime
  *     tags: [Showtimes]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateShowtime'
+ *     responses:
+ *       201:
+ *         description: Showtime created successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Admin access required
+ */
+showtimeRoutes.post("/",authMiddleware,requireRole("admin"),ValidateShowtime,createShowTimes);
+
+/**
+ * @swagger
+ * /api/showtimes/{id}:
+ *   patch:
+ *     summary: Update a showtime
+ *     tags:
+ *       - Showtimes
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: Showtime ID
+ *         schema:
+ *           type: string
+ *           example: "66c123456789abcdef123456"
  *     requestBody:
  *       required: true
  *       content:
@@ -65,86 +93,39 @@ showtimeRoutes.get("/:id", ShowTimebyID);
  *             properties:
  *               movie:
  *                 type: string
- *                 example: 68a123456789abcdef123456
+ *                 example: "66c123456789abcdef654321"
+ *               hallNo:
+ *                 type: number
+ *                 example: 2
  *               date:
  *                 type: string
  *                 format: date
- *                 example: 2026-09-01
- *               time:
+ *                 example: "2026-09-15"
+ *               startTime:
  *                 type: string
- *                 example: "19:00"
- *     responses:
- *       201:
- *         description: Showtime created successfully
- *       400:
- *         description: Validation error
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Movie not found
- *       500:
- *         description: Server error
- */
-showtimeRoutes.post(
-  "/",
-  authMiddleware,
-  requireRole,
-  ValidateShowtime,
-  createShowTimes
-);
-
-/**
- * @swagger
- * /api/showtimes/{id}:
- *   patch:
- *     summary: Update a showtime
- *     tags: [Showtimes]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         example: 68a123456789abcdef123456
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               date:
- *                 type: string
- *                 format: date
- *                 example: 2026-09-02
- *               time:
+ *                 example: "18:00"
+ *               endTime:
  *                 type: string
  *                 example: "21:00"
+ *               ticketPrice:
+ *                 type: number
+ *                 example: 150
+ *               totalCapacity:
+ *                 type: number
+ *                 example: 100
  *     responses:
  *       200:
  *         description: Showtime updated successfully
  *       400:
- *         description: Validation error
+ *         description: Invalid showtime data
  *       401:
  *         description: Unauthorized
  *       403:
- *         description: Forbidden
+ *         description: Admin access required
  *       404:
  *         description: Showtime not found
- *       500:
- *         description: Server error
  */
-showtimeRoutes.patch(
-  "/:id",
-  authMiddleware,
-  requireRole,
-  ValidateUpdate,
-  updateShowTimes
-);
+showtimeRoutes.patch("/:id",authMiddleware,requireRole("admin"),ValidateUpdate,updateShowTimes);
 
 /**
  * @swagger
@@ -160,24 +141,14 @@ showtimeRoutes.patch(
  *         required: true
  *         schema:
  *           type: string
- *         example: 68a123456789abcdef123456
  *     responses:
  *       200:
  *         description: Showtime deleted successfully
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
+ *       400:
+ *         description: Cannot delete showtime with confirmed bookings
  *       404:
  *         description: Showtime not found
- *       500:
- *         description: Server error
  */
-showtimeRoutes.delete(
-  "/:id",
-  authMiddleware,
-  requireRole,
-  deleteShowTimes
-);
+showtimeRoutes.delete("/:id",authMiddleware,requireRole("admin"),deleteShowTimes);
 
 export default showtimeRoutes;

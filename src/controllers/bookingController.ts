@@ -20,12 +20,12 @@ export const createBooking = async (req:Request, res:Response)=>{
 
         if(!showtime || !selectedSeats){
             return res.status(400).json({
-                message: "Showtime and selected seats are required",
+                message: "Showtime and selected seats are required"
             });
         }
         if(!Array.isArray(selectedSeats)||selectedSeats.length===0){
             return res.status(400).json({
-                message:"Please select at least one seat",
+                message:"Please select at least one seat"
             });
         }
 
@@ -33,7 +33,7 @@ export const createBooking = async (req:Request, res:Response)=>{
 
         if(uniqueSeats.size!==selectedSeats.length){
             return res.status(400).json({
-                message: "Duplicate seats are not allowed",
+                message: "Duplicate seats are not allowed"
             });
         }
 
@@ -41,17 +41,33 @@ export const createBooking = async (req:Request, res:Response)=>{
 
         if(!foundShowtime){
             return res.status(404).json({
-                message: "Showtime not found",
+                message: "Showtime not found"
             });
         }
+        const showtimeDate = new Date(foundShowtime.date);
 
+        const [hours, minutes] = foundShowtime.startTime.split(":").map(Number);
+
+        showtimeDate.setHours(hours, minutes, 0, 0);
+
+        if (showtimeDate <= new Date()) {
+          return res.status(400).json({
+        message: "Cannot book a showtime that has already started"
+        });
+        }
+       const availableSeats =foundShowtime.totalCapacity - foundShowtime.bookedSeats.length;
+      if (selectedSeats.length > availableSeats) {
+      return res.status(400).json({
+        message: "Not enough available seats"
+      });
+      }
         const isSeatBooked = selectedSeats.some((seat:string)=>
             foundShowtime.bookedSeats.includes(seat)
         );
 
         if(isSeatBooked){
             return res.status(400).json({
-                message: "One or more selected seats are already booked",
+                message: "One or more selected seats are already booked"
             });
         }
 
@@ -62,7 +78,7 @@ export const createBooking = async (req:Request, res:Response)=>{
             showtime,
             selectedSeats,
             totalPrice,
-            bookingStatus: "Pending",
+            bookingStatus: "Pending"
 
         });
 
@@ -71,12 +87,12 @@ export const createBooking = async (req:Request, res:Response)=>{
 
         return res.status(201).json({
             message: "Booking created successfully",
-            booking,
+            booking
         });
 
     }catch(error){
         return res.status(500).json({
-            message: "Internal Server Error",
+            message: "Internal Server Error"
         });
     }
 
@@ -85,17 +101,15 @@ export const createBooking = async (req:Request, res:Response)=>{
 export const getMyBookings = async (req:Request,res:Response)=>{
     try{
         const customerId =(req as authRequest).user.userId;
-        const bookings =await Booking.find({
-            customer: customerId,
-        }).populate("showtime");
+        const bookings =await Booking.find({customer: customerId,}).populate("Showtime");
 
         return res.status(200).json({
-            bookings,
+            bookings
         });
 
     }catch(error){
         return res.status(500).json({
-            message: "Internal Server Error",
+            message: "Internal Server Error"
         });
     }
 
@@ -104,27 +118,27 @@ export const getMyBookings = async (req:Request,res:Response)=>{
 export const getBookingById = async (req:Request,res:Response)=>{
     try{
         const {id}=req.params;
-        const booking = await Booking.findById(id).populate("showtime");
+        const booking = await Booking.findById(id).populate("Showtime");
 
         if(!booking){
             return res.status(404).json({
-                message:"Booking not found",
+                message:"Booking not found"
             });
         }
 
         if(booking.customer.toString()!==(req as authRequest).user.userId){ //converting
             return res.status(403).json({
-                message:"Access denied",
+                message:"Access denied"
             });
         } 
 
         return res.status(200).json({
-            booking,
+            booking
         });
 
     }catch(error){
         return res.status(500).json({
-            message: "Internal Server Error",
+            message: "Internal Server Error"
         });
     }
 
@@ -138,19 +152,31 @@ export const cancelBooking = async (req:Request,res:Response)=>{
 
         if(!booking){
              return res.status(404).json({
-                message: "Booking not found",
+                message: "Booking not found"
             });
+        }
+        if (booking.bookingStatus === "Cancelled") {
+          return res.status(400).json({
+          message: "Booking is already cancelled"
+        });
         }
         if(booking.customer.toString()!==(req as authRequest).user.userId){
             return res.status(403).json({
-                message: "Access denied",
+                message: "Access denied"
             });
         }
         const showtime = await showTime.findById(booking.showtime);//finding showtime
-        
-        if(!showtime){
-            return res.status(404).json({
-                message:"Showtime not found",
+        if (!showtime) {
+         return res.status(404).json({
+         message: "Showtime not found"
+        });
+        }
+        const showtimeDate = new Date(showtime.date);
+        const [hours, minutes] = showtime.startTime.split(":").map(Number);
+        showtimeDate.setHours(hours, minutes, 0, 0);
+        if (showtimeDate <= new Date()) {
+              return res.status(400).json({
+             message: "Cannot cancel a booking after the movie has started"
             });
         }
         
@@ -166,13 +192,13 @@ export const cancelBooking = async (req:Request,res:Response)=>{
 
         return res.status(200).json({
             message:"Booking cancelled Successfully",
-            booking,
+            booking
         });
 
 
     }catch(error){
         return res.status(500).json({
-            message: "Internal Server Error",
+            message: "Internal Server Error"
         });
     }
 

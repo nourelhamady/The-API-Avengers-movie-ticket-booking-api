@@ -13,5 +13,7 @@ export const createBookingValidator = [
 
   body("selectedSeats.*")
     .isString()
-    .withMessage("Each seat must be a string"),
+    .withMessage("Each seat must be a string")
+    .notEmpty()
+    .withMessage("Seat cannot be empty"),
 ];

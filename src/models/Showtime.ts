@@ -36,5 +36,5 @@ const ShowTime=new mongoose.Schema({
         type:[String],
         default:[]
     }
-})
-export const showTime = mongoose.model("showTime",ShowTime)
+});
+export const showTime = mongoose.model("Showtime",ShowTime)

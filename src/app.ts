@@ -4,7 +4,6 @@ import movieRoutes from "./routes/movieRoutes";
 import authorRoutes from "./routes/authRoutes";
 import showtimeRoutes from "./routes/showtimeRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
-import {requireRole} from "./middlewares/roleMiddleware";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
 
@@ -24,6 +23,6 @@ app.use("/api/movies", movieRoutes);
 app.use("/api/authors", authorRoutes);
 app.use("/api/showtimes", showtimeRoutes);
 app.use("/api/bookings", bookingRoutes);
-app.use("/api/auth", requireRole);
+app.use("/api/auth", authorRoutes);
 
 export default app;

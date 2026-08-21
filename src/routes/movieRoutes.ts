@@ -15,7 +15,7 @@ const movieRoutes=Router();
  * @swagger
  * /api/movies:
  *   post:
- *     summary: Create a new movie
+ *     summary: Create a movie
  *     tags: [Movies]
  *     security:
  *       - bearerAuth: []
@@ -24,31 +24,16 @@ const movieRoutes=Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 example: Inception
- *               genre:
- *                 type: string
- *                 example: Sci-Fi
- *               duration:
- *                 type: integer
- *                 example: 148
- *               releaseYear:
- *                 type: integer
- *                 example: 2010
+ *             $ref: '#/components/schemas/CreateMovie'
  *     responses:
  *       201:
  *         description: Movie created successfully
- *       400:
- *         description: Validation error
  *       401:
  *         description: Unauthorized
- *       500:
- *         description: Server error
+ *       403:
+ *         description: Admin access required
  */
-movieRoutes.post("/",authMiddleware,requireRole, validateMovie, CreateMovie);
+movieRoutes.post("/",authMiddleware,requireRole("admin"), validateMovie, CreateMovie);
 
 /**
  * @swagger
@@ -56,11 +41,26 @@ movieRoutes.post("/",authMiddleware,requireRole, validateMovie, CreateMovie);
  *   get:
  *     summary: Get all movies
  *     tags: [Movies]
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         description: Search by movie title
+ *       - in: query
+ *         name: genre
+ *         schema:
+ *           type: string
+ *         description: Filter by genre
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [Now Showing, Coming Soon]
+ *         description: Filter by movie status
  *     responses:
  *       200:
  *         description: Movies retrieved successfully
- *       500:
- *         description: Server error
  */
 movieRoutes.get("/", GetAllMovies);
 
@@ -76,14 +76,11 @@ movieRoutes.get("/", GetAllMovies);
  *         required: true
  *         schema:
  *           type: string
- *         example: 68a123456789abcdef123456
  *     responses:
  *       200:
- *         description: Movie retrieved successfully
+ *         description: Movie found
  *       404:
  *         description: Movie not found
- *       500:
- *         description: Server error
  */
 movieRoutes.get("/:id", GetOneMovie);
 
@@ -101,36 +98,20 @@ movieRoutes.get("/:id", GetOneMovie);
  *         required: true
  *         schema:
  *           type: string
- *         example: 68a123456789abcdef123456
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               title:
- *                 type: string
- *                 example: Inception Updated
- *               genre:
- *                 type: string
- *                 example: Sci-Fi
- *               duration:
- *                 type: integer
- *                 example: 150
+ *             $ref: '#/components/schemas/CreateMovie'
  *     responses:
  *       200:
  *         description: Movie updated successfully
- *       400:
- *         description: Validation error
- *       401:
- *         description: Unauthorized
  *       404:
  *         description: Movie not found
- *       500:
- *         description: Server error
  */
-movieRoutes.put("/:id",authMiddleware,requireRole, validateMovie, UpdateMovie);
+movieRoutes.put("/:id",authMiddleware,requireRole("admin"), validateMovie, UpdateMovie);
+
 
 /**
  * @swagger
@@ -146,16 +127,11 @@ movieRoutes.put("/:id",authMiddleware,requireRole, validateMovie, UpdateMovie);
  *         required: true
  *         schema:
  *           type: string
- *         example: 68a123456789abcdef123456
  *     responses:
  *       200:
  *         description: Movie deleted successfully
- *       401:
- *         description: Unauthorized
  *       404:
  *         description: Movie not found
- *       500:
- *         description: Server error
  */
-movieRoutes.delete("/:id",authMiddleware,requireRole, DeleteMovie);
+movieRoutes.delete("/:id",authMiddleware,requireRole("admin"), DeleteMovie);
 export default movieRoutes;
