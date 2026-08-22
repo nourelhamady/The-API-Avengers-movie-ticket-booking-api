@@ -101,7 +101,7 @@ export const createBooking = async (req:Request, res:Response)=>{
 export const getMyBookings = async (req:Request,res:Response)=>{
     try{
         const customerId =(req as authRequest).user.userId;
-        const bookings =await Booking.find({customer: customerId,}).populate("Showtime");
+        const bookings =await Booking.find({customer: customerId,}).populate("showtime");
 
         return res.status(200).json({
             bookings
@@ -118,7 +118,7 @@ export const getMyBookings = async (req:Request,res:Response)=>{
 export const getBookingById = async (req:Request,res:Response)=>{
     try{
         const {id}=req.params;
-        const booking = await Booking.findById(id).populate("Showtime");
+        const booking = await Booking.findById(id).populate("showtime");
 
         if(!booking){
             return res.status(404).json({
