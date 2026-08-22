@@ -71,11 +71,6 @@ const options: swaggerJsdoc.Options = {
                             format: "password",
                             example: "Password123!",
                         },
-                        role: {
-                            type: "string",
-                            enum: ["customer", "admin"],
-                            example: "customer",
-                        },
                     },
                 },
 
